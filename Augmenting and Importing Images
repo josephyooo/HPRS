@@ -107,3 +107,23 @@ for subfolder, images in augmented_images_by_subfolder.items():
         plt.imshow(images[i].permute(1, 2, 0))
         plt.axis('off')
     plt.show()
+
+# Combine all augmented images and create labels
+all_images = torch.cat([torch.stack(images) for images in augmented_images_by_subfolder.values()], dim=0)
+num_classes = len(subfolders)
+all_labels = torch.tensor(sum([[i] * len(images) for i, images in enumerate(augmented_images_by_subfolder.values())], []))
+
+# Split data into training and validation sets
+dataset = list(zip(all_images, all_labels))
+train_size = int(0.8 * len(dataset))
+val_size = len(dataset) - train_size
+train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+
+# Define DataLoader for training and validation sets
+batch_size = 64
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+
+# Check the sizes of training and validation sets
+print(f"Training set size: {len(train_dataset)}")
+print(f"Validation set size: {len(val_dataset)}")
