@@ -12,10 +12,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 # Define the directory containing the augmented images
-"""
-y'all should copy the directory where you have stored your files on your local PC
-"""
-data_dir = "C:\\Users\\wisea\\Transfer\\Deep_Learning_Files\\ProjectFilles\\Data"
+cwd = os.path.dirname(__file__)
+data_dir = os.path.join(cwd, "Image_Data/DermNet")
 
 # Define the transformations to be applied to the images
 transform = transforms.Compose([
@@ -41,14 +39,14 @@ def augment_images(directory, num_augments):
     return augmented_images
 
 # Define the subfolders containing the images
-subfolders = ['Alopecia-Pictures', 'seborrheic-dermatitis-pictures', 'Psoriasis-pictures']
+subfolders = ['Alopecia-pictures', 'seborrheic-dermatitis-pictures', 'Psoriasis-pictures']
 
 # Create a dictionary to store augmented images for each subfolder
 augmented_images_by_subfolder = {}
 
 # Define augmentation strategy
 augmentation_strategy = {
-    'Alopecia-Pictures': {
+    'Alopecia-pictures': {
         'less_than_50': 6,
         'between_50_and_100': 4,
         'more_than_100': 2
