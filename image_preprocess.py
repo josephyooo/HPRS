@@ -1,14 +1,11 @@
 import os
-import cv2
-from PIL import Image, ImageEnhance, ImageOps, ImageFilter
 import random
-import numpy as np
+
 from matplotlib import pyplot as plt
+from PIL import Image
 import torch
 import torchvision.transforms as transforms
-from torch.utils.data import DataLoader, Dataset, random_split
-from torchvision.io import read_image
-import torch.nn as nn
+from torch.utils.data import DataLoader, random_split
 import torch.nn.functional as F
 
 # Define the directory containing the augmented images
@@ -93,19 +90,20 @@ augmented_images_tensors_by_subfolder = {}
 for subfolder, images in augmented_images_by_subfolder.items():
     augmented_images_tensors_by_subfolder[subfolder] = torch.stack(images)
 
-# Display the size of tensors for each subfolder
-for subfolder, tensors in augmented_images_tensors_by_subfolder.items():
-    print(f"Subfolder: {subfolder}, Tensor size: {tensors.size()}")
+if __name__ == "__main__":
+    # Display the size of tensors for each subfolder
+    for subfolder, tensors in augmented_images_tensors_by_subfolder.items():
+        print(f"Subfolder: {subfolder}, Tensor size: {tensors.size()}")
 
-# Display 20 pictures from each subfolder
-for subfolder, images in augmented_images_by_subfolder.items():
-    print(f"\nShowing images from subfolder: {subfolder}")
-    plt.figure(figsize=(20, 5))
-    for i in range(20):  # Displaying 20 images from each subfolder
-        plt.subplot(2, 10, i + 1)
-        plt.imshow(images[i].permute(1, 2, 0))
-        plt.axis('off')
-    plt.show()
+    # Display 20 pictures from each subfolder
+    for subfolder, images in augmented_images_by_subfolder.items():
+        print(f"\nShowing images from subfolder: {subfolder}")
+        plt.figure(figsize=(20, 5))
+        for i in range(20):  # Displaying 20 images from each subfolder
+            plt.subplot(2, 10, i + 1)
+            plt.imshow(images[i].permute(1, 2, 0))
+            plt.axis('off')
+        plt.show()
 
 # Combine all augmented images and create labels
 all_images = torch.cat([torch.stack(images) for images in augmented_images_by_subfolder.values()], dim=0)
@@ -123,6 +121,7 @@ batch_size = 64
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
-# Check the sizes of training and validation sets
-print(f"Training set size: {len(train_dataset)}")
-print(f"Validation set size: {len(val_dataset)}")
+if __name__ == "__main__":
+    # Check the sizes of training and validation sets
+    print(f"Training set size: {len(train_dataset)}")
+    print(f"Validation set size: {len(val_dataset)}")
