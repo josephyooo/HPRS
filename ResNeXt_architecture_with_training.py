@@ -1,3 +1,9 @@
+import torch
+import torch.nn as nn
+from torch import optim
+
+from image_preprocess import train_loader, val_loader
+
 class ConvBlock(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0):
         super(ConvBlock, self).__init__()
@@ -72,7 +78,7 @@ class ResNeXt(nn.Module):
 
 # Instantiate the model
 model = ResNeXt(num_blocks=[5, 5, 5, 5], cardinality=32, num_classes=3)
-print(model)
+# print(model)
 
 # Define loss function and optimizer
 criterion = nn.CrossEntropyLoss()

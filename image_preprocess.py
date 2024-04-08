@@ -4,9 +4,8 @@ import random
 from matplotlib import pyplot as plt
 from PIL import Image
 import torch
-import torchvision.transforms as transforms
+from torchvision.transforms import v2 as transforms
 from torch.utils.data import DataLoader, random_split
-import torch.nn.functional as F
 
 # Define the directory containing the augmented images
 cwd = os.path.dirname(__file__)
