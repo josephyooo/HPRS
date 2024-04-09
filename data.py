@@ -24,9 +24,9 @@ def get_data_loaders(data_dir=None, transform=None, augmenter=None, batch_size=6
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=shuffle)
+    val_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=shuffle)
 
-    return train_loader, test_loader
+    return train_loader, val_loader
 
 
 if __name__ == "__main__":
