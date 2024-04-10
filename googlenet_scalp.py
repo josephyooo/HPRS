@@ -7,56 +7,21 @@ import torch.nn as nn
 import torch.optim as optim
 from torchvision.models import googlenet, GoogLeNet_Weights
 import torchvision.transforms.v2 as v2
-import torchvision
 
-from data_prep import get_data_loaders
+from data_prep import DermNet, get_dataloaders
 
-class GoogLeNetHair(nn.Module):
-    def __init__(self, device, weights=None, num_classes=3):
+class GoogLeNet_Scalp(nn.Module):
+    def __init__(self, device, num_classes):
         super().__init__()
         # self.model = torch.hub.load('pytorch/vision:v0.10.0', 'googlenet', weights=GoogLeNet_Weights.DEFAULT)
         self.model = googlenet(weights=GoogLeNet_Weights.DEFAULT)
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs, num_classes)
 
-        if weights:
-            self.model.load_state_dict(torch.load(weights))
-
         self.model.to(device)
     
     def forward(self, x):
         return self.model(x)
-
-'''
-set batchsize to 4 to work well
-import matplotlib.pyplot as plt
-import numpy as np
-
-from data import DermNet
-
-def imshow(inp, title=None):
-    """Display image for Tensor."""
-    inp = inp.numpy().transpose((1, 2, 0))
-    mean = np.array([0.485, 0.456, 0.406])
-    std = np.array([0.229, 0.224, 0.225])
-    inp = std * inp + mean
-    inp = np.clip(inp, 0, 1)
-    plt.rcParams['figure.figsize'] = (20, 20)
-    plt.imshow(inp)
-    if title is not None:
-        plt.title(title)
-    plt.pause(0.001)  # pause a bit so that plots are updated
-
-# Get a batch of training data
-inputs, classes = next(iter(dataloaders['train']))
-
-# Make a grid from batch
-out = torchvision.utils.make_grid(inputs)
-
-dataset = DermNet()
-class_names = dataset.classes
-imshow(out, title=[class_names[x] for x in classes])
-'''
 
 # Reference: https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
 def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs, device, augmenter=None):
@@ -149,17 +114,21 @@ if __name__ == "__main__":
     torch.backends.cudnn.benchmark = True
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    # finetune model
-    model_ft = GoogLeNetHair(device=device)
-    model_ft.load_state_dict(torch.load('weights/googlenet_hair_100.pt'))
-
+    # get transform and augment
     transform = GoogLeNet_Weights.DEFAULT.transforms()
     augmenter = v2.AugMix()
 
-    train_loader, val_loader = get_data_loaders(transform=transform,
-                                                batch_size=batch_size, num_workers=num_workers, pin_memory=pin_memory)
+    # get dataset and data loaders
+    dataset = DermNet(transform=transform)
+    num_classes = len(dataset.classes)
+    train_loader, val_loader = get_dataloaders(
+        dataset=dataset, transform=transform, batch_size=batch_size,
+        num_workers=num_workers, pin_memory=pin_memory
+    )
     dataloaders = {'train': train_loader, 'val': val_loader}
 
+    # setup model
+    model_ft = GoogLeNet_Scalp(device=device, num_classes=num_classes)
 
     criterion = nn.CrossEntropyLoss()
     optimizer_ft = optim.Adam(model_ft.parameters(), lr=lr, eps=eps, weight_decay=weight_decay)
@@ -167,7 +136,7 @@ if __name__ == "__main__":
 
     model_ft = train_model(model_ft, dataloaders, criterion, optimizer_ft, lr_scheduler,
                            num_epochs=num_epochs, device=device, augmenter=augmenter)
-    torch.save(model_ft.state_dict(), 'weights/googlenet_hair.pt')
+    torch.save(model_ft.state_dict(), 'weights/googlenet_scalp.pt')
 
 
 
