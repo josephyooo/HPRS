@@ -4,7 +4,7 @@ An application of Modern Convolutional Neural Networks to Recommend Hair Product
 ## Data
 Alopecia, psoriasis, and seborrheic-dermatitis photos taken from DermNet (Ani's source and [Kaggle](https://www.kaggle.com/datasets/shubhamgoel27/dermnet)).
 
-Healthy hair photos taken from [Patch1k](http://projects.i-ctm.eu/it/progetto/).
+Healthy hair photos taken from [Patch1k](http://projects.i-ctm.eu/it/progetto/figaro-1k).
 
 ## To-do
 - [x] ResNeXt implementation: 77% validation accuracy
