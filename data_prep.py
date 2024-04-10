@@ -27,7 +27,6 @@ def get_dataloaders(dataset, transform=None, batch_size=64, split=0.2, shuffle=T
 
 
 if __name__ == "__main__":
-    #%%
     import matplotlib.pyplot as plt
     import numpy as np
     import torchvision
@@ -59,4 +58,3 @@ if __name__ == "__main__":
     class_names = dataset.classes
     # [:-9] to remove to '-pictures' suffix
     imshow(out, title=[class_names[x][:-9] for x in classes])
-# %%
