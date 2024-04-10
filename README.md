@@ -11,12 +11,15 @@ Healthy hair photos taken from [Patch1k](http://projects.i-ctm.eu/it/progetto/fi
 - [x] GoogLeNet implementation: 100% validation accuracy
 - [x] AdamNet implementation: 78% validation accuracy
 - [ ] Decision tree for hair product recommendation
-- [ ] Create and finish poster
-  - [ ] https://docs.google.com/presentation/d/1hA5rWyWDMbacixMjWD9grUZqYVMUG_hAqZQ-85CnVOQ/edit?usp=sharing
-  - [ ] Submit for printing (By Wed 5.00 PM!!!)
 - [ ] Finish paper
   - https://www.overleaf.com/read/tqvqgkvzsyzn#d77e2c
     - https://cscit.cs.gsu.edu/sp/printers/poster
+- [ ] Create and finish poster
+  - [ ] https://docs.google.com/presentation/d/1hA5rWyWDMbacixMjWD9grUZqYVMUG_hAqZQ-85CnVOQ/edit?usp=sharing
+  - [x] Submit for printing (By Wed 5.00 PM!!!)
+  - [ ] Poster status: https://cscit.cs.gsu.edu/support/tickets.php
+    - jyoo30@student.gsu.edu
+    - #00092
 - [ ] Implement focal loss to fix over-represented healthy hair
 - [ ] Clean ResNeXt code
   - [ ] Remove data loading code
