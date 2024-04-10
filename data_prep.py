@@ -7,7 +7,7 @@ from torchvision.transforms._presets import ImageClassification
 def DermNet(data_dir=None, transform=None):
     if not data_dir:
         cwd = os.path.dirname(__file__)
-        data_dir = os.path.join(cwd, "Image_Data/DermNet")
+        data_dir = os.path.join(cwd, "Image_Data")
     if not transform:
         # Use standard ImageNet normalization
         transform = ImageClassification(crop_size=224)
