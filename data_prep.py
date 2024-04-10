@@ -14,10 +14,8 @@ def DermNet(data_dir=None, transform=None):
 
     return datasets.ImageFolder(data_dir, transform=transform)
 
-def get_data_loaders(data_dir=None, transform=None, batch_size=64, test_split=0.2, shuffle=True, num_workers = 4, pin_memory=False):
-    dataset = DermNet(data_dir, transform=transform)
-
-    train_size = int((1 - test_split) * len(dataset))
+def get_dataloaders(dataset, transform=None, batch_size=64, split=0.2, shuffle=True, num_workers = 4, pin_memory=False):
+    train_size = int((1 - split) * len(dataset))
     test_size = len(dataset) - train_size
 
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
@@ -29,12 +27,36 @@ def get_data_loaders(data_dir=None, transform=None, batch_size=64, test_split=0.
 
 
 if __name__ == "__main__":
-    from matplotlib import pyplot as plt
-    train_loader, test_loader = get_data_loaders()
-    train_features, train_labels = next(iter(train_loader))
-    img = train_features[0]
-    label = train_labels[0]
     #%%
-    figure = plt.figure()
-    plt.imshow(img.movedim(0, 2))
-    plt.show()
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import torchvision
+
+    plt.rcParams['font.size'] = 10
+
+    # https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
+    def imshow(inp, title=None):
+        """Display image for Tensor."""
+        inp = inp.numpy().transpose((1, 2, 0))
+        mean = np.array([0.485, 0.456, 0.406])
+        std = np.array([0.229, 0.224, 0.225])
+        inp = std * inp + mean
+        inp = np.clip(inp, 0, 1)
+        plt.imshow(inp)
+        if title is not None:
+            plt.title(title)
+        plt.pause(0.001)  # pause a bit so that plots are updated
+
+    # Get a batch of training data
+    dataset = DermNet()
+    loader = get_dataloaders(dataset, batch_size=4)[0]
+    inputs, classes = next(iter(loader))
+
+    # Make a grid from batch
+    out = torchvision.utils.make_grid(inputs)
+
+    dataset = DermNet()
+    class_names = dataset.classes
+    # [:-9] to remove to '-pictures' suffix
+    imshow(out, title=[class_names[x][:-9] for x in classes])
+# %%
