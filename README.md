@@ -4,7 +4,7 @@ An application of Modern Convolutional Neural Networks to Recommend Hair Product
 ## To-do
 - [x] ResNeXt implementation: 77% validation accuracy
 - [x] GoogLeNet implementation: 100% validation accuracy
-- [x] AdamNet implementation: 73% validation accuracy
+- [x] AdamNet implementation: 78% validation accuracy
 - [ ] Decision tree for hair product recommendation
 - [ ] Finish paper
   - https://www.overleaf.com/read/tqvqgkvzsyzn#d77e2c
