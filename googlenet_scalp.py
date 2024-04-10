@@ -2,23 +2,37 @@ import time
 import os
 from tempfile import TemporaryDirectory
 
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torchvision.models import googlenet, GoogLeNet_Weights
+import torchvision.transforms.v2 as v2
+import torchvision
+
+from data_prep import get_data_loaders
+
+class GoogLeNetHair(nn.Module):
+    def __init__(self, device, weights=None, num_classes=3):
+        super().__init__()
+        # self.model = torch.hub.load('pytorch/vision:v0.10.0', 'googlenet', weights=GoogLeNet_Weights.DEFAULT)
+        self.model = googlenet(weights=GoogLeNet_Weights.DEFAULT)
+        num_ftrs = self.model.fc.in_features
+        self.model.fc = nn.Linear(num_ftrs, num_classes)
+
+        if weights:
+            self.model.load_state_dict(torch.load(weights))
+
+        self.model.to(device)
+    
+    def forward(self, x):
+        return self.model(x)
+
+'''
+set batchsize to 4 to work well
 import matplotlib.pyplot as plt
 import numpy as np
-import torch
-import torchvision
-from torchvision.models import GoogLeNet, GoogLeNet_Weights
 
-from data import get_data_loaders
-
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-# model = torch.hub.load('pytorch/vision:v0.10.0', 'googlenet', pretrained=True)
-weights = GoogLeNet_Weights.DEFAULT
-model = GoogLeNet(weights=weights)
-
-train_loader, val_loader = get_data_loaders(transform=weights.transform)
-dataloaders = {'train': train_loader, 'val': val_loader}
+from data import DermNet
 
 def imshow(inp, title=None):
     """Display image for Tensor."""
@@ -27,11 +41,11 @@ def imshow(inp, title=None):
     std = np.array([0.229, 0.224, 0.225])
     inp = std * inp + mean
     inp = np.clip(inp, 0, 1)
+    plt.rcParams['figure.figsize'] = (20, 20)
     plt.imshow(inp)
     if title is not None:
         plt.title(title)
     plt.pause(0.001)  # pause a bit so that plots are updated
-
 
 # Get a batch of training data
 inputs, classes = next(iter(dataloaders['train']))
@@ -39,9 +53,13 @@ inputs, classes = next(iter(dataloaders['train']))
 # Make a grid from batch
 out = torchvision.utils.make_grid(inputs)
 
+dataset = DermNet()
+class_names = dataset.classes
 imshow(out, title=[class_names[x] for x in classes])
+'''
 
-def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=25):
+# Reference: https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
+def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs, device, augmenter=None):
     since = time.time()
 
     # Create a temporary directory to save training checkpoints
@@ -53,7 +71,7 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=
         dataset_sizes = {phase: len(dataloader.dataset) for phase, dataloader in dataloaders.items()}
 
         for epoch in range(num_epochs):
-            print(f'Epoch {epoch}/{num_epochs - 1}')
+            print(f'Epoch {epoch+1}/{num_epochs} | Learning Rate {optimizer.param_groups[0]["lr"]}')
             print('-' * 10)
 
             # Each epoch has a training and validation phase
@@ -71,8 +89,11 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=
                     inputs = inputs.to(device)
                     labels = labels.to(device)
 
+                    if augmenter:
+                        inputs = augmenter(inputs)
+
                     # zero the parameter gradients
-                    optimizer.zero_grad()
+                    optimizer.zero_grad(set_to_none=True)
 
                     # forward
                     # track history if only in train
@@ -111,4 +132,42 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=
         # load best model weights
         model.load_state_dict(torch.load(best_model_params_path))
     return model
+
+if __name__ == "__main__":
+    # hyperparameters
+    batch_size = 64
+    lr = 1e-3
+    eps = 1e-4
+    weight_decay = 1e-3
+    step_size = 7
+    gamma = 0.1
+    num_epochs = 25
+
+    # optimizations
+    num_workers = 12
+    pin_memory = True
+    torch.backends.cudnn.benchmark = True
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    # finetune model
+    model_ft = GoogLeNetHair(device=device)
+    # model_ft.load_state_dict(torch.load('googlenet_hair.pt'))
+
+    transform = GoogLeNet_Weights.DEFAULT.transforms()
+    augmenter = v2.AugMix()
+
+    train_loader, val_loader = get_data_loaders(transform=transform,
+                                                batch_size=batch_size, num_workers=num_workers, pin_memory=pin_memory)
+    dataloaders = {'train': train_loader, 'val': val_loader}
+
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer_ft = optim.Adam(model_ft.parameters(), lr=lr, eps=eps, weight_decay=weight_decay)
+    lr_scheduler = optim.lr_scheduler.StepLR(optimizer_ft, step_size=step_size, gamma=gamma)
+
+    model_ft = train_model(model_ft, dataloaders, criterion, optimizer_ft, lr_scheduler,
+                           num_epochs=num_epochs, device=device, augmenter=augmenter)
+    torch.save(model_ft.state_dict(), 'googlenet_hair.pt')
+
+
 
