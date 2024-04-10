@@ -10,6 +10,8 @@ An application of Modern Convolutional Neural Networks to Recommend Hair Product
   - https://www.overleaf.com/read/tqvqgkvzsyzn#d77e2c
 - [ ] Create and finish poster
   - [ ] Create and link canva or figma
+  - [ ] Submit for printing (By Wed 5.00 PM!!!)
+    - https://cscit.cs.gsu.edu/sp/printers/poster
 - [ ] Clean ResNeXt code
 - [ ] Make logo
 - [ ] Submit to arxiv?
