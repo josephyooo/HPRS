@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
     # finetune model
     model_ft = GoogLeNetHair(device=device)
-    # model_ft.load_state_dict(torch.load('googlenet_hair.pt'))
+    model_ft.load_state_dict(torch.load('weights/googlenet_hair_100.pt'))
 
     transform = GoogLeNet_Weights.DEFAULT.transforms()
     augmenter = v2.AugMix()
@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
     model_ft = train_model(model_ft, dataloaders, criterion, optimizer_ft, lr_scheduler,
                            num_epochs=num_epochs, device=device, augmenter=augmenter)
-    torch.save(model_ft.state_dict(), 'googlenet_hair.pt')
+    torch.save(model_ft.state_dict(), 'weights/googlenet_hair.pt')
 
 
 
