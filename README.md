@@ -13,7 +13,7 @@ Healthy hair photos taken from [Patch1k](http://projects.i-ctm.eu/it/progetto/fi
 - [ ] Decision tree for hair product recommendation
 - [ ] Finish paper
   - https://www.overleaf.com/read/tqvqgkvzsyzn#d77e2c
-    - https://cscit.cs.gsu.edu/sp/printers/poster
+  - Linking github: https://academia.stackexchange.com/questions/20358/how-should-i-reference-my-github-repository-with-materials-for-my-paper
 - [ ] Create and finish poster
   - [ ] https://docs.google.com/presentation/d/1hA5rWyWDMbacixMjWD9grUZqYVMUG_hAqZQ-85CnVOQ/edit?usp=sharing
   - [x] Submit for printing (By Wed 5.00 PM!!!)
