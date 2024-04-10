@@ -2,3 +2,4 @@ pyproject.toml
 __pycache__/
 poetry.lock
 t.py
+weights/model_checkpoint.pt
