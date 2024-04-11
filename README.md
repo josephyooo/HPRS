@@ -2,14 +2,15 @@
 An application of Modern Convolutional Neural Networks to Recommend Hair Products.
 
 ## Data
-Alopecia, psoriasis, and seborrheic-dermatitis photos taken from DermNet (Ani's source and [Kaggle](https://www.kaggle.com/datasets/shubhamgoel27/dermnet)).
+Alopecia, psoriasis, and seborrheic-dermatitis photos taken from DermNet (Ani's source and [Kaggle](https://www.kaggle.com/datasets/shubhamgoel27/dermnet)) and DermNetNZ ([Github](https://github.com/Mrinmoy-Roy/Scalp-Hair-Diseases-Detection/tree/main)).
 
-Healthy hair photos taken from [Patch1k](http://projects.i-ctm.eu/it/progetto/figaro-1k).
+Healthy hair photos taken from [Patch 1k](http://projects.i-ctm.eu/it/progetto/figaro-1k).
 
 ## To-do
 - [x] ResNeXt implementation: 77% validation accuracy
 - [x] GoogLeNet implementation: 100% validation accuracy
 - [x] AdamNet implementation: 78% validation accuracy
+- [x] Find and add more data?
 - [ ] Decision tree for hair product recommendation
 - [ ] Finish paper
   - https://www.overleaf.com/read/tqvqgkvzsyzn#d77e2c
@@ -26,7 +27,6 @@ Healthy hair photos taken from [Patch1k](http://projects.i-ctm.eu/it/progetto/fi
 - [ ] Transition ResNext model to inherit from `nn.Module`
   - "Your models should also subclass this class."
   - https://pytorch.org/docs/stable/generated/torch.nn.Module.html
-- [ ] Find and add more data?
 - [ ] Make logo
 - [ ] Submit to arxiv?
   -  https://info.arxiv.org/help/submit/index.html
