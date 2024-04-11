@@ -3,6 +3,7 @@ import os
 from tempfile import TemporaryDirectory
 
 import torch
+import torch.nn as nn
 
 # Reference: https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
 # Generic method to train a model, refer to googlenet_scalp_training.ipynb for an example
@@ -79,3 +80,12 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
         # load best model weights
         model.load_state_dict(torch.load(best_model_params_path))
     return model
+
+# https://discuss.pytorch.org/t/focal-loss-for-imbalanced-multi-class-classification-in-pytorch/61289/2
+def focal_loss(alpha=0.25, gamma=2):
+    def criterion(outputs, targets):
+        ce_loss = nn.functional.cross_entropy(outputs, targets, reduction='none')
+        pt = torch.exp(-ce_loss)
+        focal_loss = (alpha * (1-pt)**gamma * ce_loss).mean()
+        return focal_loss
+    return criterion
