@@ -12,6 +12,9 @@ Healthy hair photos taken from [Patch 1k](http://projects.i-ctm.eu/it/progetto/f
 - [x] AdamNet implementation: 78% validation accuracy
 - [x] Find and add more data?
 - [ ] Decision tree for hair product recommendation
+  - https://my.clevelandclinic.org/health/diseases/21753-hair-loss
+  - https://www.mayoclinic.org/diseases-conditions/psoriasis/diagnosis-treatment/drc-20355845
+  - https://www.mayoclinic.org/diseases-conditions/seborrheic-dermatitis/diagnosis-treatment/drc-20352714
 - [ ] Finish paper
   - [x] Redo abstract, include models besides ResNeXt
   - [ ] Finish model explanation (4)
