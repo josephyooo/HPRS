@@ -14,6 +14,8 @@ Healthy hair photos taken from [Patch 1k](http://projects.i-ctm.eu/it/progetto/f
 - [ ] Decision tree for hair product recommendation
 - [ ] Finish paper
   - [x] Redo abstract, include models besides ResNeXt
+  - [ ] Finish model explanation (4)
+  - [ ] Finish (5)
   - https://www.overleaf.com/read/tqvqgkvzsyzn#d77e2c
   - Linking github: https://academia.stackexchange.com/questions/20358/how-should-i-reference-my-github-repository-with-materials-for-my-paper
 - [ ] Create and finish poster
