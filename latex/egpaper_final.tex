@@ -64,13 +64,13 @@ Georgia State University\\
 
 %%%%%%%%% ABSTRACT
 \begin{abstract}
-Advancements in machine learning and computer vision have paved the way for sophisticated algorithms and models in medical diagnosis and treatment. This project focuses on leveraging convolutional neural networks (CNNs) to predict three common hair and scalp conditions from images and recommending appropriate treatments. These conditions include alopecia, psoriasis, and seborrheic dermatitis. Such work can assist those affected in early detection and treatment planning, as such conditions often progress without concern or ability to visit a professional for a diagnosis. The methodology includes data collection from diverse sources, preprocessing of the data, the testing of three popular pretrained convolutional image classification models, and a recommendation of treatment, given that a condition was predicted. The three models include ResNeXt, GoogLeNet, and AlexNet, and is used for our application, either through fine-tuning the models or using the models as a fixed-feature extractor. Augmentation using RandAugment was applied during training to expand the dataset and improve generalization of the models. Finally, a survey of treatments for the hair and scalp conditions was conducted and used to design a decision tree that could be used to recommend treatments given the prediction of a condition. Limited availability of accessible and uniform data made our task of classifying hair and scalp conditions difficult and made our task of learning treatments according to hair and scalp conditions infeasible. Across the three models and our tests, we achieved a maximum validation accuracy of 99\% and accuracies of 94.6\%, 100\%, 90.3\%, and 97.8\% for predicting alopecia, healthy, psoriasis, and seborrheic dermatitis, respectively, over all data.
+Advancements in machine learning and computer vision have paved the way for sophisticated algorithms and models in medical diagnosis and treatment. This project focuses on leveraging convolutional neural networks (CNNs) to predict three common hair and scalp conditions from images and recommend appropriate treatments. These conditions include alopecia, psoriasis, and seborrheic dermatitis. Such work can assist those affected in early detection and treatment planning, as such conditions often progress without concern or the ability to visit a professional for a diagnosis. The methodology includes data collection from diverse sources, preprocessing of the data, the testing of three popular pretrained convolutional image classification models, and a recommendation of treatment, given that a condition was predicted. The three models include ResNeXt, GoogLeNet, and AlexNet, and are used for our application, either through fine-tuning the models or using the models as a fixed-feature extractor. Augmentation using RandAugment was applied during training to expand the dataset and improve the generalization of the models. Finally, a survey of treatments for the hair and scalp conditions was conducted and used to design a decision tree that could be used to recommend treatments given the prediction of a condition. The limited availability of accessible and uniform data made our task of classifying hair and scalp conditions difficult and made our task of learning treatments according to hair and scalp conditions infeasible. Across the three models and our tests, we achieved a maximum validation accuracy of 99\% and accuracies of 94.6\%, 100\%, 90.3\%, and 97.8\% for predicting alopecia, healthy, psoriasis, and seborrheic dermatitis, respectively, overall data.
 \end{abstract}
 
 %%%%%%%%% BODY TEXT
 \section{Introduction}
 
-Hair diseases can adversely impact an individual's quality of life, specifically their comfort and self-esteem. Identifying hair products relevant to specific hair diseases is crucial for providing appropriate treatment. This project proposes to leverage convolutional neural networks (CNNs) and modern deep learning techniques to determine a person's hair disease, or lack thereof, and recommend hair products to treat their condition appropriately.
+Hair diseases can adversely impact an individual's quality of life, specifically their comfort and self-esteem. Identifying hair products relevant to specific hair diseases is crucial for providing appropriate treatment. This project proposes to leverage convolutional neural networks (CNNs) and modern deep learning techniques to determine a person's hair or scalp condition, or lack thereof, and recommend hair products to treat their condition appropriately. This hair product recommendation will not be based on their condition but on the latent representation of the condition that our network produces. By doing this, we hope to address the issue of treatment based on the severity or variation of the condition, rather than treatment based on the label alone.
 %-------------------------------------------------------------------------
 \section{Related Work}
 Health evaluation is a long-time application of machine learning. Particularly, research into scalp damage recognition and hair disease identification using deep learning has begun relatively recently (2018, [5]). In a study by [1], physical and chemical analysis was conducted on 15,000 microscopic hair surface images to evaluate the degree of hair damage. A CNN, named SACN-Net, was then trained with 80\% of these evaluations to predict the degree of hair damage based on the hair surface images. SACN-Net utilizes residual connections, attention modules, and a global average pooling and performed better than several other CNN models, including ResNet50, with a test accuracy of 98.38\% on 20\% of the data.
@@ -81,8 +81,11 @@ A holistic, robust system, called ScalpEye, for efficient inspection and diagnos
 
 Overall, an assortment of work has been conducted on the evaluation of scalp health and identification of scalp hair diseases, with many having impressive results. However, no studies on hair product recommendation systems were found. In this work, we will leverage and build upon the work of others and utilize these techniques to construct an effective hair treatment recommendation system.
 %------------------------------------------------------------------------
-\section{Data}
-A drawback of deep learning is the large amount of data required for an accurate, but generalized model. Our dataset includes images labeled with hair and scalp conditions and healthy hair. Images labeled with hair and scalp conditions were collected from Kaggle, a data request, and a Github repository, originating from the DermNet and DermNetNZ dataset. Images labeled with healthy hair were collected from the Figaro 1K dataset.
+\section{Methodology}
+\subsection{Data Collection}
+A drawback of deep learning is the large amount of data required for an accurate, generalized model, especially when data is seldom available, labeled, and free.
+
+For our hair and scalp condition classification problem, we collected images labeled with hair and scalp conditions and healthy hair. Images labeled with hair and scalp conditions were collected from Kaggle, a data request, and a Github repository, originating from the DermNet and DermNetNZ datasets. Images labeled with healthy hair were collected from the Figaro 1K dataset. The number of images for each category is listed in Table \ref{tblipl}. A sample image from each category is shown in Fig. \ref{figsec}
 
 \begin{figure}[H]
 \centering
@@ -97,34 +100,66 @@ A drawback of deep learning is the large amount of data required for an accurate
 \hline
 \end{tabular}
 \captionof{table}{Images per Label}
+\label{tblipl}
 \end{figure}
-This data was preprocessed according to how the respective model was trained. This typically looks like a resizing, central crop, and normalization using a mean and standard deviation of ImageNet [8]. During training, an augmentation technique called RandAugment [9] was applied to the batches.
-%------------------------------------------------------------------------
-\section{Methodology}
-\subsection{Model}
-As aforementioned, data will be preprocessed according to conventional techniques for transfer learning. This process is shown in Fig. 1. The standard ImageNet transforms include a resizing to 256x256 pixels using billinear interpolation, a central crop to 224x224 pixels, and a normalization to the mean and standard deviation of the dataset. During training, augmentation is applied to batches of images using RandAugment. This technique chooses and applies some number of randomly chosen transformations at some severity. The number of transformations and their severity are two hyper-parameters of a hyper-parameter search problem based on validation accuracy [9].
 \begin{figure}[htp]
   % Equal length
   \hspace*{\fill}%
-  \subcaptionbox{Original\label{fig1:a}}{\includegraphics[scale=0.15]{sample_image}}\hfill%
-  \subcaptionbox{Transformed\label{fig1:b}}{\includegraphics[scale=0.3]{transformed_image}}%
+  \subcaptionbox{Healthy\label{figsec:a}}{\includegraphics[scale=0.4]{healthy_sample}}\hfill%
+  \subcaptionbox{Alopecia\label{figsec:b}}{\includegraphics[scale=0.2]{sample_image}}%
+  \hspace*{\fill}%
+
+  \hspace*{\fill}%
+  \subcaptionbox{Psoriasis\label{figsec:c}}{\includegraphics[scale=0.2]{psoriasis_sample}}%
   \hfill%
-  \subcaptionbox{Transformed and Augmented\label{fig1:c}}{\includegraphics[scale=0.3]{latex/images/transformed_augmented_image.jpg}}%
+  \subcaptionbox{Seborrheic Dermatitis\label{figsec:d}}{\includegraphics[scale=0.2]{seborrheic_dermatitis_sample}}%
+  \hspace*{\fill}%
+\caption{Sample of Each Category}
+\label{figsec}
+\end{figure}
+% This data was preprocessed according to how the respective model was trained. This typically looks like a resizing, central crop, and normalization using a mean and standard deviation of ImageNet [8]. During training, an augmentation technique called RandAugment [9] was applied to the batches.
+Unfortunately, we could not collect data for our hair treatment recommendation problem. As stated in our introduction, we hoped to administer a treatment based on a latent representation of the condition, rather than the label of the condition alone. To achieve this, we would require a dataset that includes images of hair and scalp conditions, labels of the condition, and prescribed treatments. Such a dataset was not readily available on the internet.
+
+\subsection{Data Processing}
+Data will be preprocessed according to conventional techniques for transfer learning. This process is shown in Fig. \ref{figimgpre}. The standard ImageNet transforms include a resizing to 256x256 pixels using bilinear interpolation, a central crop to 224x224 pixels, and a normalization to the mean and standard deviation of the dataset. Augmentation will be applied to diversify our limited training data during training using RandAugment. This technique chooses and applies some number of randomly chosen transformations at some severity. The number of transformations and their severity are two hyper-parameters of a hyper-parameter search problem based on validation accuracy [9].
+\begin{figure}[htp]
+  % Equal length
+  \hspace*{\fill}%
+  \subcaptionbox{Original\label{figimgpre:a}}{\includegraphics[scale=0.15]{sample_image}}\hfill%
+  \subcaptionbox{Transformed\label{figimgpre:b}}{\includegraphics[scale=0.35]{transformed_image}}%
+  \hfill%
+  \subcaptionbox{Transformed and Augmented\label{figimgpre:c}}{\includegraphics[scale=0.35]{latex/images/transformed_augmented_image.jpg}}%
   \hspace*{\fill}%
 \caption{Image Preprocessing}
+\label{figimgpre}
 \end{figure}
 
-One of the factors that the generalization of a deep learning model depends on is the balanced-ness of the dataset. A great imbalance risks the model developing a bias for the majority label(s). If so, a model may exhibit a high accuracy, but a confusion matrix will reveal that the model performs well only on the biased labels. Given that a majority of our data is labeled as "Healthy", our model is likely to develop a bias for that label. A variety of techniques exist to circumvent this issue. We will compare three techniques: a control, sampling with respect to the inverse frequency of the labels, and a modified loss function. In the control, batches will be sampled with an assumption that the data is balanced. Sampling with respect to the inverse frequency of the labels is based on the technique of under-and-oversampling, pulling more images from the under-represented labels and less images from the over-represented labels, relative to the control. The modified loss function is a multi-class implementation of a technique called focal loss [13]. Simply put, it can be thought to "encourage" the model to prefer the predictions of false positives over false negatives (i.e. predicting a condition when there is none is preferable to predicting no condition when there is one).
+\subsection{Model}
+We will apply transfer learning to three popular pre-trained models to classify hair and scalp conditions. These models include AlexNet [12], GoogLeNet [10], and ResNeXt [7], which all utilize convolutions. AlexNet is a classic convolution network that pushed the capabilities of CNNs at the time. GoogLeNet presented the idea of "Inception Modules", which could be stacked to build a robust network [10]. Finally, ResNeXt builds upon another model, ResNet, by exploring cardinality in addition to depth and width. Cardinality refers to the number of paths taken through a residual block. By increasing the cardinality, ResNeXt models could outperform ResNet models of similar complexity [7]. Each model will be trained, and the best-performing weights of each model will be saved and compared. The best-performing model will be used for the condition classifier of the hair and scalp treatment recommendation system.
 
-We will apply transfer learning to three different popular pre-trained models to classify hair and scalp conditions. These models include ResNeXt [7], GoogLeNet [10], and AlexNet [12], and all utilize convolutions. ResNeXt builds upon... The best performing weights of each model will be saved and compared. The best performing model will be used for the condition classifier of the hair and scalp treatment recommendation system.
+For transfer learning, we can either fine-tune the model or use the model as a fixed-feature extractor. Considering that the new dataset is small and different from the original dataset (ImageNet), we should use the model as a fixed-feature extractor to avoid over-fitting [11]. However, we will try both techniques and compare their performances.
 
-For transfer learning, we can either fine-tune the model and using the model as a fixed-feature extractor. Considering that the new dataset is small and different from the original dataset (ImageNet), we should use the model as a fixed-feature extractor to avoid over-fitting [11]. However, we will try both techniques and compare their performances.
+One of the factors that the generalization of a deep learning model depends on is the balancedness of the dataset. A great imbalance risks the model developing a bias for the majority label(s). If so, a model may exhibit a high accuracy, but a confusion matrix will reveal that the model performs well only on the biased labels. Given that most of our data is labeled as "Healthy", our model will likely develop a bias for that label. A variety of techniques exist to circumvent this issue. We will compare three techniques: a control, weighted random sampling, and a modified loss function. In the control, batches will be sampled with the assumption that the data is balanced. Weighted random sampling is randomly sampling from the data with a stronger emphasis on the under-represented data and a weaker emphasis on the over-represented data. These weights can also be thought of as the inverse of the frequency of each label. The modified loss function is a multi-class implementation of a technique called focal loss [13], whose form is shown below:
+\begin{equation}
+\label{eqn:focal_loss}
+\text{FL}(p_t)=-\alpha_t(1-p_t)^\gamma\log{p_t}
+\end{equation}
+Simply put, it can be thought to "encourage" the model to prefer the predictions of false positives over false negatives (i.e. predicting a condition when there is none is preferable to predicting no condition when there is one).
+
 
 \subsection{Treatment Recommendation}
+Despite our inability to collect data relevant to this part of our problem, we collected treatment options for the scalp and hair conditions of this work into a decision tree. This decision tree is shown below in Fig. \ref{fig:dtto}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[scale=0.06]{treatments_chart}
+    \caption{Decision Tree of Treatment Options}
+    \label{fig:dtto}
+\end{figure}
 
 %------------------------------------------------------------------------
 \section{Experiments and Results}
-
+Across the three models and transfer learning techniques, we found that fine-tuning the pretrained GoogLeNet to our data yielded the best validation accuracy. Table \ref{fig:cm} shows the maximum validation accuracies of all models.
 \begin{figure}[H]
 \centering
 \begin{tabular}{ |c|c|c| }
@@ -136,47 +171,25 @@ For transfer learning, we can either fine-tune the model and using the model as 
  AlexNet & 90\% \\
 \hline
 \end{tabular}
-\captionof{table}{Model \& Validation Accuracy}
+\captionof{table}{Validation Accuracies of Each Model}
+\end{figure}
+\begin{figure}[htp]
+    \centering
+    \includegraphics[scale=0.4]{confusion_matrix}
+    \caption{Confusion Matrix of Fine-tuned GoogLeNet}
+    \label{fig:cm}
+\end{figure}
+However, the confusion matrix of the fine-tuned GoogLeNet matches what we hypothesized, that the imbalance of data would cause the model to bias the over-represented data. This disparity is seen in Figure \ref{fig:cm}, where healthy samples are predicted with 100\% accuracy while psoriasis samples are predicted with only 90.3\% accuracy. To mitigate this, we tried applying weight random sampling and applying focal loss to our training. We were willing to suffer an overall accuracy to gain a reduction in the variance of the accuracies across the labels. Surprisingly, neither method was effective. Weighted random sampling led to over-fitting across multiple trials, resulting in a training accuracy of 100\% and a validation accuracy of ~75\%. In addition to significantly longer training times, applying focal loss gave an overall accuracy worse than the control, with a maximum validation accuracy of 93\% and a more severely biased model. As shown in Figure \ref{fig:cmfl}, our model trained with focal loss often misclassified psoriasis, correctly classifying only 59\% of samples.
+\begin{figure}[htp]
+    \centering
+    \includegraphics[scale=0.4]{confusion_matrix_fl}
+    \caption{Confusion Matrix of Fine-tuned GoogLeNet with Focal Loss Applied}
+    \label{fig:cmfl}
 \end{figure}
 
-\begin{figure}[H]
-\begin{tikzpicture}
-\begin{axis}[
-    % title={Accuracy of Models to FLOPs},
-    width=8cm,height=7cm,
-    xlabel={FLOPs [Billions]},
-    ylabel={Accuracy [\%]},
-    xmin=0, xmax=4,
-    ymin=0, ymax=100,
-    xtick={0,1,2,3,4},
-    ytick={0,20,40,60,80,100},
-    legend pos=north west,
-    ymajorgrids=true,
-    grid style=dashed,
-]
-
-\addplot[
-    color=blue,
-    ]
-    coordinates {
-    (0,25)(1,40)(2,10)(3,5)(4,70)
-    };
-\addplot[
-    color=green,
-    ]
-    coordinates {
-    (0,80)(1,20)(2,40)(3,70)(4,90)
-    };
-\legend{ResNet50, HPRS-Net}
-\end{axis}
-\end{tikzpicture}
-\caption{Model FLOPs to Accuracy}
-\end{figure}
-
-As seen in Table 1, HPRS-Net outperforms ResNet50, a general purpose image classifier, and SACN-Net, a scalp image classifier. Furthermore, our model is more efficient than ResNet50, as seen in Figure 1.
 %------------------------------------------------------------------------
 \section{Conclusions}
-We do not have any results to conclude from.
+Hair and scalp conditions require quick diagnosis and treatment for effective mitigation. Thus, a lack of awareness, lengthiness of diagnosis, and cost of diagnosis and treatment all stand in the way of effective mitigation. With the context of prior work relevant to our problem in mind, we applied transfer learning to three powerful pre-trained models to classify three common hair and scalp conditions, and the lack thereof, using 371 images of hair and scalp conditions, and 1050 images of healthy hair. After training, we achieved a high maximum overall validation accuracy of 99\% using GoogLeNet. However, our model presented biases that our techniques were unable to mitigate, predicting healthy hair with extremely high accuracy (100\%) and predicting psoriasis with a significantly lower accuracy (90.3\%). Furthermore, an absence of data correlating hair conditions or images of hair conditions with treatments rendered our goal of learning treatment predictions infeasible.
 %------------------------------------------------------------------------
 {\small
 \nocite{*}
