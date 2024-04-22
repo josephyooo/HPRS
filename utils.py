@@ -14,6 +14,8 @@ from data_prep import DermNet, get_dataloaders
 def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs, device, augmenter=None):
     since = time.time()
 
+    accuracies = []
+    losses = []
     # Create a temporary directory to save training checkpoints
     with TemporaryDirectory() as tempdir:
         best_model_params_path = os.path.join(tempdir, 'best_model_params.pt')
@@ -68,6 +70,9 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
                 epoch_loss = running_loss / dataset_sizes[phase]
                 epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
+                losses.append(epoch_loss)
+                accuracies.append(epoch_acc)
+
                 print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
 
                 # deep copy the model
@@ -83,17 +88,17 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
 
         # load best model weights
         model.load_state_dict(torch.load(best_model_params_path))
-    return model
+    return model, losses, accuracies
 
-def finetune(model, dataset,
+def transfer_learn(model, dataset, ffe=False,
              batch_size=64,
              lr=1e-4,
              eps=1e-4,
              weight_decay=1e-4,
              step_size=7,
              gamma=0.1,
-             num_epochs=25,
-             num_workers=12,
+             num_epochs=50,
+             num_workers=4,
              pin_memory=True,
              benchmark=True):
     # optimizations
@@ -102,7 +107,7 @@ def finetune(model, dataset,
 
     # get augment
     ## Reference: https://sebastianraschka.com/blog/2023/data-augmentation-pytorch.html
-    augmenter = v2.RandAugment(num_ops=3)
+    augmenter = v2.RandAugment()
 
     # get dataset and data loaders (dataset is already transformed)
     num_classes = len(dataset.classes)
@@ -113,19 +118,23 @@ def finetune(model, dataset,
     dataloaders = {'train': train_loader, 'val': val_loader}
 
     # setup model
-    model_ft = model(device=device, num_classes=num_classes)
+    model_ft = model(device=device, num_classes=num_classes, ffe=ffe)
 
     # model_ft.load_state_dict(torch.load(f'weights/{model.__name__}_ft.pt'))
+
 
     criterion = nn.CrossEntropyLoss()
     optimizer_ft = optim.Adam(model_ft.parameters(), lr=lr, eps=eps, weight_decay=weight_decay)
     lr_scheduler = optim.lr_scheduler.StepLR(optimizer_ft, step_size=step_size, gamma=gamma)
 
-    model_ft = train_model(model_ft, dataloaders, criterion, optimizer_ft, lr_scheduler,
+    model_ft, losses, accuracies = train_model(model_ft, dataloaders, criterion, optimizer_ft, lr_scheduler,
                             num_epochs=num_epochs, device=device, augmenter=augmenter)
 
     # save model
-    torch.save(model_ft.state_dict(), f'weights/{model.__name__}_ft.pt')
+    # torch.save(model_ft.state_dict(), f'weights/{model.__name__}_ft.pt')
+    torch.save(model_ft.state_dict(), f'{model.__name__}_ft.pt')
+    torch.save(losses, f'{model.__name__}_ft_losses.pt')
+    torch.save(losses, f'{model.__name__}_ft_accuracies.pt')
 
 
 # https://discuss.pytorch.org/t/focal-loss-for-imbalanced-multi-class-classification-in-pytorch/61289/2
