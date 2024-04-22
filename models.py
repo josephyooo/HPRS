@@ -14,8 +14,14 @@ class GoogLeNet_Scalp(nn.Module):
         if ffe:
             for param in self.model.parameters():
                 param.requires_grad = False
-
-        self.model.fc = nn.Linear(num_ftrs, num_classes)
+            self.model.fc = nn.Sequential(
+                nn.Linear(num_ftrs, num_ftrs),
+                nn.Linear(num_ftrs, num_ftrs//2),
+                nn.Linear(num_ftrs//2, num_ftrs//2),
+                nn.Linear(num_ftrs//2, num_classes)
+            )
+        else:
+            self.model.fc = nn.Linear(num_ftrs, num_classes)
 
         self.model.to(device)
     
@@ -34,8 +40,14 @@ class AlexNet_Scalp(nn.Module):
         if ffe:
             for param in self.model.parameters():
                 param.requires_grad = False
-
-        self.model.classifier[6] = nn.Linear(num_ftrs, num_classes)
+            self.model.classifier[6] = nn.Sequential(
+                nn.Linear(num_ftrs, num_ftrs),
+                nn.Linear(num_ftrs, num_ftrs//2),
+                nn.Linear(num_ftrs//2, num_ftrs//2),
+                nn.Linear(num_ftrs//2, num_classes)
+            )
+        else:
+            self.model.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
         self.model.to(device)
     
@@ -54,8 +66,14 @@ class ResNeXt_Scalp(nn.Module):
         if ffe:
             for param in self.model.parameters():
                 param.requires_grad = False
-
-        self.model.fc = nn.Linear(num_ftrs, num_classes)
+            self.model.fc = nn.Sequential(
+                nn.Linear(num_ftrs, num_ftrs),
+                nn.Linear(num_ftrs, num_ftrs//2),
+                nn.Linear(num_ftrs//2, num_ftrs//2),
+                nn.Linear(num_ftrs//2, num_classes)
+            )
+        else:
+            self.model.fc = nn.Linear(num_ftrs, num_classes)
 
         self.model.to(device)
     
