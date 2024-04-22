@@ -2,7 +2,7 @@ from collections import Counter
 import os
 
 from torch import Tensor
-from torch.utils.data import DataLoader, Subset, WeightedRandomSampler
+from torch.utils.data import DataLoader, random_split, WeightedRandomSampler
 from torchvision import datasets
 from torchvision.transforms._presets import ImageClassification
 
@@ -23,13 +23,12 @@ def get_balanced_weights(dataset, datasubset):
     # The numerator can be any constant but I guessed using a greater value would preserve precision
     return counts.max() / counts
 
-def get_dataloaders(dataset, transform=None, batch_size=64, split=0.2, shuffle=True, num_workers = 4, pin_memory=False, weighted_random_sampling=False):
+def get_dataloaders(dataset, batch_size=64, split=0.2, shuffle=True, num_workers = 4, pin_memory=False, weighted_random_sampling=False):
     train_size = int((1 - split) * len(dataset))
     val_size = len(dataset) - train_size
 
-    # deterministic split to not overlap train and val indices
-    train_dataset = Subset(dataset, range(train_size))
-    val_dataset = Subset(dataset, range(train_size, train_size + val_size))
+    # if using pretrained weights to train, ensure that the same torch.random.seed is used
+    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
     if weighted_random_sampling:
         weights = get_balanced_weights(dataset, train_dataset)
@@ -37,7 +36,7 @@ def get_dataloaders(dataset, transform=None, batch_size=64, split=0.2, shuffle=T
 
         train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, sampler=sampler, num_workers=num_workers, pin_memory=pin_memory)
     else:
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory)
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers, pin_memory=pin_memory)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers, pin_memory=pin_memory)
 
     return train_loader, val_loader
