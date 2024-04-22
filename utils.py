@@ -1,9 +1,13 @@
-import time
 import os
+import time
 from tempfile import TemporaryDirectory
 
 import torch
 import torch.nn as nn
+import torch.optim as optim
+import torchvision.transforms.v2 as v2
+
+from data_prep import DermNet, get_dataloaders
 
 # Reference: https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
 # Generic method to train a model, refer to googlenet_scalp_training.ipynb for an example
@@ -80,6 +84,49 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
         # load best model weights
         model.load_state_dict(torch.load(best_model_params_path))
     return model
+
+def finetune(model, dataset,
+             batch_size=64,
+             lr=1e-4,
+             eps=1e-4,
+             weight_decay=1e-4,
+             step_size=7,
+             gamma=0.1,
+             num_epochs=25,
+             num_workers=12,
+             pin_memory=True,
+             benchmark=True):
+    # optimizations
+    torch.backends.cudnn.benchmark = benchmark
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    # get augment
+    ## Reference: https://sebastianraschka.com/blog/2023/data-augmentation-pytorch.html
+    augmenter = v2.RandAugment(num_ops=3)
+
+    # get dataset and data loaders (dataset is already transformed)
+    num_classes = len(dataset.classes)
+    train_loader, val_loader = get_dataloaders(
+        dataset=dataset, batch_size=batch_size,
+        num_workers=num_workers, pin_memory=pin_memory
+    )
+    dataloaders = {'train': train_loader, 'val': val_loader}
+
+    # setup model
+    model_ft = model(device=device, num_classes=num_classes)
+
+    # model_ft.load_state_dict(torch.load(f'weights/{model.__name__}_ft.pt'))
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer_ft = optim.Adam(model_ft.parameters(), lr=lr, eps=eps, weight_decay=weight_decay)
+    lr_scheduler = optim.lr_scheduler.StepLR(optimizer_ft, step_size=step_size, gamma=gamma)
+
+    model_ft = train_model(model_ft, dataloaders, criterion, optimizer_ft, lr_scheduler,
+                            num_epochs=num_epochs, device=device, augmenter=augmenter)
+
+    # save model
+    torch.save(model_ft.state_dict(), f'weights/{model.__name__}_ft.pt')
+
 
 # https://discuss.pytorch.org/t/focal-loss-for-imbalanced-multi-class-classification-in-pytorch/61289/2
 def focal_loss(alpha=0.25, gamma=2):
