@@ -131,10 +131,10 @@ def transfer_learn(model, dataset, ffe=False,
                             num_epochs=num_epochs, device=device, augmenter=augmenter)
 
     # save model
-    # torch.save(model_ft.state_dict(), f'weights/{model.__name__}_ft.pt')
-    torch.save(model_ft.state_dict(), f'{model.__name__}_ft.pt')
-    torch.save(losses, f'{model.__name__}_ft_losses.pt')
-    torch.save(losses, f'{model.__name__}_ft_accuracies.pt')
+    mode = 'ffe' if ffe else 'ft'
+    torch.save(model_ft.state_dict(), f'weights/{model.__name__}_{mode}.pt')
+    torch.save(losses, f'weights/{model.__name__}_{mode}_losses.pt')
+    torch.save(accuracies, f'weights/{model.__name__}_{mode}_accuracies.pt')
 
 
 # https://discuss.pytorch.org/t/focal-loss-for-imbalanced-multi-class-classification-in-pytorch/61289/2
