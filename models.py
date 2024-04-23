@@ -61,7 +61,7 @@ class ResNeXt_Scalp(nn.Module):
         ffe: Fine-tuning or Fixed feature extraction
         """
         super().__init__()
-        self.model = resnext50_32x4d(weights=ResNeXt50_32X4D_Weights)
+        self.model = resnext50_32x4d(weights=ResNeXt50_32X4D_Weights.DEFAULT)
         num_ftrs = self.model.fc.in_features
         if ffe:
             for param in self.model.parameters():
