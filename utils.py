@@ -71,7 +71,7 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
                 epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
                 losses.append(epoch_loss)
-                accuracies.append(epoch_acc)
+                accuracies.append(epoch_acc.item()) # .item() needed b/c epoch_acc is tensor
 
                 print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
 
@@ -132,9 +132,10 @@ def transfer_learn(model, dataset, ffe=False,
 
     # save model
     mode = 'ffe' if ffe else 'ft'
-    torch.save(model_ft.state_dict(), f'weights/{model.__name__}_{mode}.pt')
-    torch.save(losses, f'weights/{model.__name__}_{mode}_losses.pt')
-    torch.save(accuracies, f'weights/{model.__name__}_{mode}_accuracies.pt')
+    path = 'weights/'
+    torch.save(model_ft.state_dict(), f'{path}{model.__name__}_{mode}.pt')
+    torch.save(losses, f'{path}{model.__name__}_{mode}_losses.pt')
+    torch.save(accuracies, f'{path}{model.__name__}_{mode}_accuracies.pt')
 
 
 # https://discuss.pytorch.org/t/focal-loss-for-imbalanced-multi-class-classification-in-pytorch/61289/2
